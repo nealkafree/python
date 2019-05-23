@@ -1,4 +1,6 @@
 import nltk
+import sklearn
+from nltk.classify.scikitlearn import SklearnClassifier
 
 
 def read_file(path):
@@ -69,5 +71,6 @@ feature_set = prepare_data(dataset, scores)
 print(feature_set[0])
 train_set = feature_set[0:round(len(feature_set) * 0.8)]
 test_set = feature_set[round(len(feature_set) * 0.8):]
-classifier = nltk.NaiveBayesClassifier.train(train_set)
+classifier = SklearnClassifier(sklearn.svm.LinearSVC())
+classifier.train(train_set)
 print(nltk.classify.accuracy(classifier, test_set))
