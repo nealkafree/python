@@ -1,4 +1,5 @@
 import nltk
+import math
 import sklearn
 from nltk.classify.scikitlearn import SklearnClassifier
 
@@ -8,7 +9,7 @@ def read_file(path):
         return file.read().split("\n")
 
 
-def prepare_data(dataset, scores):
+def prepare_data( dataset, scores):
     return_data = []
     j = 0
     for text, score in zip(dataset, scores):
@@ -65,12 +66,23 @@ def close_brackets_feature(text):
     return c
 
 
-dataset = read_file("data/dataset_40757_1.txt")
+dataset = read_file("data/texts_train.txt")
 scores = read_file("data/scores_train.txt")
 feature_set = prepare_data(dataset, scores)
 print(feature_set[0])
-train_set = feature_set[0:round(len(feature_set) * 0.8)]
-test_set = feature_set[round(len(feature_set) * 0.8):]
-classifier = SklearnClassifier(sklearn.svm.LinearSVC())
+test_part = round(len(feature_set) * 0.2)
+test_set = feature_set[0:test_part]
+train_set = feature_set[test_part:]
+classifier = SklearnClassifier(sklearn.svm.LinearSVC(max_iter=10000))
 classifier.train(train_set)
-print(nltk.classify.accuracy(classifier, test_set))
+max_dif = 0
+aver_dif = 0
+for test in test_set:
+    score = classifier.classify(test[0])
+    abs = math.fabs(int(score) - int(test[1]))
+    print(str(score) + " : " + str(test[1]) + ' | ' + str(abs) + "    " + str(test[0]))
+    if abs > max_dif:
+        max_dif = abs
+    aver_dif += abs
+print(max_dif)
+print(aver_dif / len(test_set))
