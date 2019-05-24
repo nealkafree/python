@@ -47,13 +47,6 @@ def prepare_data(text_data):
             for j in range(SYMBOLS):
                 data_row["prev" + str(j + 1)] = get_attr(prev_word, j + 1)
 
-            # data_row["pres_first"] = get_attr(word, 1)
-            # data_row["pres_second"] = get_attr(word, 2)
-            # data_row["pres_third"] = get_attr(word, 3)
-            # data_row["prev_first"] = get_attr(prev_word, 1)
-            # data_row["prev_second"] = get_attr(prev_word, 2)
-            # data_row["prev_third"] = get_attr(prev_word, 3)
-
             features.append((data_row, label))
             real_data.append(prev_word + " + " + word)
             i += 1
@@ -68,20 +61,26 @@ def get_attr(word, i):
 
 
 data = parse_xml_for_data("annot.opcorpora.no_ambig.xml")
-feature_set, words_set = prepare_data(data)
+# feature_set, words_set = prepare_data(data)
+#
+# k = round(len(feature_set) * 0.8)
+# train_set = feature_set[0:k]
+# test_set = feature_set[k:]
+#
+# classifier = nltk.NaiveBayesClassifier.train(train_set)
+#
+# words_set = words_set[k:]
+# for test, words in zip(test_set, words_set):
+#     prediction = classifier.classify(test[0])
+#     if not prediction == test[1]:
+#         print(words + " = " + prediction + " : " + test[1])
+# print()
+# print(nltk.classify.accuracy(classifier, test_set))
+# print()
+# print(classifier.most_informative_features(20))
 
-k = round(len(feature_set) * 0.8)
-train_set = feature_set[0:k]
-test_set = feature_set[k:]
+hmm_k = round(len(data) * 0.8)
+hmm_train_set = data[0:hmm_k]
+hmm_test_set = data[hmm_k:]
 
-classifier = nltk.NaiveBayesClassifier.train(train_set)
-
-words_set = words_set[k:]
-for test, words in zip(test_set, words_set):
-    prediction = classifier.classify(test[0])
-    if not prediction == test[1]:
-        print(words + " = " + prediction + " : " + test[1])
-print()
-print(nltk.classify.accuracy(classifier, test_set))
-print()
-print(classifier.most_informative_features(20))
+hmm_classifier = nltk.tag.hmm.HiddenMarkovModelTagger.train(hmm_train_set, hmm_test_set)

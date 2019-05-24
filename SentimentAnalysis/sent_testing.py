@@ -9,7 +9,7 @@ def read_file(path):
         return file.read().split("\n")
 
 
-def prepare_data( dataset, scores):
+def prepare_data(dataset, scores):
     return_data = []
     j = 0
     for text, score in zip(dataset, scores):
