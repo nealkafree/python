@@ -161,10 +161,10 @@ evaluate = read_file("data/dataset_40757_1.txt")
 
 dataset = prepare_data_simple(dataset, scores)
 evaluate = prepare_eval_simple(evaluate)
-
+print("start training...")
 classifier = SklearnClassifier(sklearn.svm.LinearSVC(max_iter=10000))
 classifier.train(dataset)
-
+print("start evaluating...")
 with open("data/answer.txt", 'a', encoding="UTF-8") as file:
     for eval_set in evaluate:
         file.write(classifier.classify(eval_set) + '\n')
