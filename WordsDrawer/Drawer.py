@@ -1,7 +1,7 @@
 import sys
 
 from PIL import Image
-from FractalDrawer import FractalDrawer
+from WordsDrawer.FractalDrawer import FractalDrawer
 
 
 def pixel_processing(img_x, img_y, iterations, vector):

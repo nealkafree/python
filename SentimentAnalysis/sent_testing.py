@@ -1,7 +1,6 @@
 import re
 
 import nltk
-import math
 import sklearn
 
 from nltk.classify.scikitlearn import SklearnClassifier
