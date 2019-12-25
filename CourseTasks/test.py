@@ -1,4 +1,7 @@
 import itertools
+import sys
+import re
+import requests
 
 
 def mul2(x):
@@ -49,6 +52,10 @@ def check_for_insights(s, t):
     return a
 
 
-s = input()
-t = input()
-print(check_for_insights(s, t))
+params = {'json': 'true'}
+for line in sys.stdin:
+    content = requests.get('http://numbersapi.com/' + line.rstrip() + '/math', params=params)
+    if content.json()['found']:
+        print('Interesting')
+    else:
+        print('Boring')
