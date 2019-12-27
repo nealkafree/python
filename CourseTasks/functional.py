@@ -1,6 +1,7 @@
-from functools import reduce, wraps
+import operator
+from functools import reduce, wraps, partial
 
-from toolz import curry
+from toolz import curry, compose
 
 
 def composition(*args):
@@ -94,7 +95,6 @@ def bucket(func, *d_args, **d_kwargs):
     return inner
 
 
-@bucket(1, 2, 3, [1, 2, 3], 'one', 'two', 'three', two=2, one=1, three=3)
 def inc(x):
     return x + 1
 
@@ -116,6 +116,7 @@ def makeDecorator(func):
     @curry
     def inner(dec_func, *args, **kwargs):
         return func(dec_func, *args, **kwargs)
+
     return inner
 
 
@@ -129,6 +130,7 @@ def introduce(f, *args, **kwargs):
 def id(*whatever):
     return whatever
 
+
 @introduce
 def square(x):
     return x ** 2
@@ -138,4 +140,34 @@ def double(x):
     return x * 2
 
 
-print(square(11))
+def mean(l):
+    return reduce(operator.add, l, 0) / len(l)
+
+
+def var(l):
+    return reduce(lambda a, x: a + (x - mean(l)) ** 2, l, 0) / len(l)
+
+def correlation(xl, yl):
+    zipWith = lambda tfunc: compose(partial(map, tfunc), zip)
+    mean = lambda l: reduce(operator.add, l, 0) / len(l)
+    sdv = lambda l: (reduce(lambda a, x: a + (x - mean(l)) ** 2, l, 0) / len(l)) ** 0.5
+    fold = lambda t: (t[0] * t[1] - mean(xl) * mean(yl))
+    return sum(zipWith(fold)(xl, yl)) / (len(xl) * sdv(xl) * sdv(yl))
+
+# f = inc
+# x = 0
+# zero = lambda f: lambda x: x
+# one = lambda f: lambda x: f(x)
+# two = lambda f: lambda x: f(f(x))
+# three = lambda f: lambda x: f(f(f(x)))
+# succ = lambda n: lambda f: lambda x: f(n(f)(x))
+# plus = lambda m: lambda n: lambda f: lambda x: m(f)(n(f)(x))
+# times = lambda m: lambda n: lambda f: m(n(f))
+# power = lambda m: lambda n: lambda f: n(m)(f)
+# true = lambda x: lambda y: x
+# false = lambda x: lambda y: y
+# und = lambda b1: lambda b2: b1(b2)(b1)
+# orr = lambda b1: lambda b2: b2(b2)(b1)
+# isZero = lambda numeral: numeral(lambda x: false)(true)
+
+print(correlation([1,2,3],[3,2,1]))
