@@ -31,14 +31,14 @@ def make_data_ready(event_data, submissions_data):
 
     # Наибольшая разница между timestamp событий
     temp = (event_data.groupby('user_id').timestamp.max() - event_data.groupby(
-        'user_id').first_timestamp.max()) \
-        .to_frame().reset_index().rename(columns={0: 'timestamp_diff_events'})
+        'user_id').timestamp.min()) \
+        .to_frame().reset_index().rename(columns={'timestamp': 'timestamp_diff_events'})
     x = x.merge(temp, on='user_id', how='outer')
 
     # Наибольшая разница между timestamp сабмитов
     temp = (submissions_data.groupby('user_id').timestamp.max() - submissions_data.groupby(
-        'user_id').first_timestamp.max()) \
-        .to_frame().reset_index().rename(columns={0: 'timestamp_diff_submits'})
+        'user_id').timestamp.min()) \
+        .to_frame().reset_index().rename(columns={'timestamp': 'timestamp_diff_submits'})
     x = x.merge(temp, on='user_id', how='outer')
 
     # Отношение правильно решенных заданий к неправильным
