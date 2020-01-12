@@ -60,7 +60,7 @@ def get_attr(word, i):
         return "*"
 
 
-data = parse_xml_for_data("annot.opcorpora.no_ambig.xml")
+data = parse_xml_for_data("annot.opcorpora.no_ambig(old).xml")
 # feature_set, words_set = prepare_data(data)
 #
 # k = round(len(feature_set) * 0.8)
@@ -84,3 +84,4 @@ hmm_train_set = data[0:hmm_k]
 hmm_test_set = data[hmm_k:]
 
 hmm_classifier = nltk.tag.hmm.HiddenMarkovModelTagger.train(hmm_train_set, hmm_test_set)
+
