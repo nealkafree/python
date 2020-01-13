@@ -102,7 +102,7 @@ def sentence_to_matrix(text):
     for sentence in text:
         words = word_tokenize(sentence)
         words = [lose_non_russian_alphabet(word).lower() for word in words if lose_non_russian_alphabet(word)]
-        words = [prediction.normal_form for prediction in predictor.predict(words)]
+        # words = [prediction.normal_form for prediction in predictor.predict(words)]
         normal_text.append(words)
     M = []
     for sentence, i in zip(normal_text, range(len(text))):
