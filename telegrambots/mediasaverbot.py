@@ -3,6 +3,7 @@ import os
 import shutil
 
 import ffmpeg
+import face_recognition
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 
@@ -72,11 +73,18 @@ def save_photo(update, context):
     if not os.path.exists(path):
         os.mkdir(path)
 
-    file_id = update.message.photo[-1].file_id
-    new_voice = context.bot.get_file(file_id)
-    new_voice.download(os.path.join(path, 'photo_' + str(len(os.listdir(path)))))
+    new_photo = context.bot.get_file(update.message.photo[-1].file_id)
+    path_to_photo = os.path.join(path, 'photo_' + str(len(os.listdir(path))))
+    new_photo.download(path_to_photo)
 
-    text = 'Эта фотография сохранена.'
+    image = face_recognition.load_image_file(path_to_photo)
+    face_locations = face_recognition.face_locations(image)
+    if len(face_locations) == 0:
+        os.remove(path_to_photo)
+        text = 'Эта фотография не сохранена.'
+    else:
+        text = 'Эта фотография сохранена.'
+
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 

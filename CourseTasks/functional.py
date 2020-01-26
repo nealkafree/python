@@ -147,12 +147,30 @@ def mean(l):
 def var(l):
     return reduce(lambda a, x: a + (x - mean(l)) ** 2, l, 0) / len(l)
 
+
 def correlation(xl, yl):
     zipWith = lambda tfunc: compose(partial(map, tfunc), zip)
     mean = lambda l: reduce(operator.add, l, 0) / len(l)
     sdv = lambda l: (reduce(lambda a, x: a + (x - mean(l)) ** 2, l, 0) / len(l)) ** 0.5
     fold = lambda t: (t[0] * t[1] - mean(xl) * mean(yl))
     return sum(zipWith(fold)(xl, yl)) / (len(xl) * sdv(xl) * sdv(yl))
+
+
+def findTheTriple():
+    forward = range(1, 499)
+    backward = range(499, 1, -1)
+
+    def check_triple(acc_tuple, in_tuple):
+        a = in_tuple[0]
+        b = in_tuple[1]
+        c = 1000 - a - b
+        if a ** 2 + b ** 2 == c ** 2:
+            print(a)
+            acc_tuple = (a, b, c)
+        return acc_tuple
+
+    return reduce(check_triple, zip(forward, backward), (0, 0, 0))
+
 
 # f = inc
 # x = 0
@@ -170,4 +188,4 @@ def correlation(xl, yl):
 # orr = lambda b1: lambda b2: b2(b2)(b1)
 # isZero = lambda numeral: numeral(lambda x: false)(true)
 
-print(correlation([1,2,3],[3,2,1]))
+print(findTheTriple())
