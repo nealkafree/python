@@ -58,9 +58,9 @@ with open('train_corpus', encoding='UTF-8') as file:
     print(bigram_dict)
 
     # for sent in test_text:
-    #     bigr = bigrams(sent)
+    #     key = bigrams(sent)
     #     probab = 1
-    #     for first, second in bigr:
+    #     for first, second in key:
     #         d = bigram_dict[first]
     #         if second in d:
     #             p = d[second] / freq_dict[first]

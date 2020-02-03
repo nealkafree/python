@@ -155,9 +155,9 @@ def bow_3symb_features(text):
     return features
 
 
-dataset = read_file("data/texts_train.txt")
-scores = read_file("data/scores_train.txt")
-evaluate = read_file("data/dataset_40757_1.txt")
+dataset = read_file("data\\texts_train.txt")
+scores = read_file("data\\scores_train.txt")
+evaluate = read_file("data\\dataset_40757_1.txt")
 
 dataset = prepare_data_simple(dataset, scores)
 evaluate = prepare_eval_simple(evaluate)

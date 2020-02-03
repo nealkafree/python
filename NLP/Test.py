@@ -22,4 +22,4 @@ def return_vec(document):
 # vec1 = return_vec(line1.split())
 # vec2 = return_vec(line2.split())
 # res = sum([x * y for x, y in zip(vec1, vec2)])
-# print(res)
+# print([20])
