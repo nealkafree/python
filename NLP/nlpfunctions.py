@@ -9,6 +9,9 @@ from pymystem3 import Mystem
 # from rnnmorph.predictor import RNNMorphPredictor
 from tqdm import tqdm
 import numpy as np
+import sklearn
+from nltk.classify.scikitlearn import SklearnClassifier
+import pymorphy2
 
 POS_TAGS = {'NOUN': 'S', 'ADJF': 'A', 'ADJS': 'A', 'COMP': 'A', 'VERB': 'V', 'INFN': 'V', 'PRTF': 'V',
             'GRND': 'V', 'ADVB': 'ADV', 'PRED': 'ADV', 'PRCL': 'ADV', 'INTJ': 'ADV', 'PREP': 'PR'}
@@ -264,34 +267,123 @@ def read_file(path):
 
 
 def extraction_preprocess(dataset):
+    # Для каждой строки в датасети делает токензацию,
+    # а затем приписывает каждому токену номер символа его начала и его длину
     # Затем приписать каждому токену его контекст (+-N) и сопоставить с тренировочными данными
     # А также начинается ли тег с большой буквы
     dataset_prep = []
+    morph = pymorphy2.MorphAnalyzer()
     for line in dataset:
         words = word_tokenize(line)
         words_prep = []
-        i = 1
-        words_prep.append((words[0], 0, len(words[0])))
+        i = 0
         while i < len(words):
-            if words[i] in '.,;!?:»)' or words[i - 1] in '(«' or words[i - 1] == '``':
-                words_prep.append((words[i], words_prep[i - 1][1] + words_prep[i - 1][2], len(words[i])))
+            if i == 0:
+                words_prep.append((morph.parse(words[i])[0].normal_form, 0, len(words[i])))
+            elif words[i] in '.,;!?:»)' or words[i - 1] in '(«' or words[i - 1] == '``':
+                words_prep.append((morph.parse(words[i])[0].normal_form, words_prep[i - 1][1] + words_prep[i - 1][2], len(words[i])))
             elif words[i] == "''":
-                words_prep.append((words[i], words_prep[i - 1][1] + words_prep[i - 1][2], len(words[i]) - 1))
+                words_prep.append((morph.parse(words[i])[0].normal_form, words_prep[i - 1][1] + words_prep[i - 1][2], len(words[i]) - 1))
             elif words[i] == '``':
-                words_prep.append((words[i], words_prep[i - 1][1] + words_prep[i - 1][2] + 1, len(words[i]) - 1))
+                words_prep.append((morph.parse(words[i])[0].normal_form, words_prep[i - 1][1] + words_prep[i - 1][2] + 1, len(words[i]) - 1))
             else:
-                words_prep.append((words[i], words_prep[i - 1][1] + words_prep[i - 1][2] + 1, len(words[i])))
+                words_prep.append((morph.parse(words[i])[0].normal_form, words_prep[i - 1][1] + words_prep[i - 1][2] + 1, len(words[i])))
             i += 1
         dataset_prep.append(words_prep)
     return dataset_prep
 
 
 def prepare_answers(answers):
-    pass
+    # Собирает каждуй строку в словарь, где ключом является кортеж из номера символа начала токена и его длины,
+    # а значением класс этого токена
+    answers_prep = []
+    for line in answers:
+        line_prep = {}
+        line = line.split()
+        start = 0
+        length = 0
+        for token in line:
+            if token == 'EOL':
+                break
+            elif token in ['ORG', 'PERSON']:
+                line_prep[(int(start), int(length))] = token
+                start = 0
+                length = 0
+            else:
+                if start:
+                    length = token
+                else:
+                    start = token
+        answers_prep.append(line_prep)
+    return answers_prep
 
 
-def prepare_features(dataset, answers):
-    pass
+def prepare_train_features(dataset, answers, len_context):
+    train_features = []
+    for line, answers_line in zip(dataset, answers):
+        for token in line:
+            features = {}
+            j = line.index(token)
+
+            for i in range(2 * len_context + 1):
+
+                def get_feature():
+                    if 0 <= j + i - len_context < len(line):
+                        return line[j + i - len_context][0]
+                    else:
+                        return '###'
+
+                features[i] = get_feature()
+
+            # print(str((token[0], token[1])) + str(answers_line))
+            if (token[1], token[2]) in answers_line:
+                answer = answers_line[(token[1], token[2])]
+            else:
+                answer = 'USUAL'
+
+            train_features.append((features, answer))
+    return train_features
 
 
-prep = extraction_preprocess(read_file('train_sentences.txt')[0:20])
+def prepare_classify_features(dataset, len_context):
+    lines = []
+    for line in dataset:
+        test_features = []
+        for token in line:
+            features = {}
+            j = line.index(token)
+
+            for i in range(2 * len_context + 1):
+
+                def get_feature():
+                    if 0 <= j + i - len_context < len(line):
+                        return line[j + i - len_context][0]
+                    else:
+                        return '###'
+
+                features[i] = get_feature()
+            test_features.append((features, (token[1], token[2])))
+        lines.append(test_features)
+    return lines
+
+
+features = prepare_train_features(extraction_preprocess(read_file('train_sentences.txt')[0: -1]),
+                                  prepare_answers(read_file('train_nes.txt')[0: -1]), 5)
+
+classifier = SklearnClassifier(sklearn.svm.LinearSVC(max_iter=10000))
+classifier.train(features)
+
+test_features = prepare_classify_features(extraction_preprocess(read_file('dataset_40163_1.txt')[0: -1]), 5)
+with open('answer', 'w', encoding='UTF-8') as file:
+    for line in test_features:
+        string = ''
+        test = [t[0] for t in line]
+        write = [t[1] for t in line]
+        answers = classifier.classify_many(test)
+        i = 0
+        while i < len(answers):
+            if not answers[i] == 'USUAL':
+                string += str(write[i][0]) + ' ' + str(write[i][1]) + ' ' + answers[i] + ' '
+            i += 1
+        string += 'EOL\n'
+        file.write(string)
