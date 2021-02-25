@@ -33,7 +33,7 @@ class NeuralNetwork:
 
     # train the neural network
     def train(self, inputs_list, targets_list):
-        # convert inputs list to 2d array
+        # convert_dir inputs proc_list to 2d array
         inputs = numpy.array(inputs_list, ndmin=2).T  # (inodes, 1)
         targets = numpy.array(targets_list, ndmin=2).T  # (onodes, 1)
 
@@ -62,7 +62,7 @@ class NeuralNetwork:
 
     # query the neural network
     def query(self, inputs_list):
-        # convert inputs list to 2d array
+        # convert_dir inputs proc_list to 2d array
         inputs = numpy.array(inputs_list, ndmin=2).T  # (inodes, 1)
 
         # calculate signals into hidden layer
@@ -91,17 +91,17 @@ if __name__ == '__main__':
     # create instance of neural network
     network = NeuralNetwork(input_nodes, hidden_nodes, output_nodes, learning_rate)
 
-    # load the mnist training data CSV file into a list
+    # load the mnist training groups CSV file into a proc_list
     with open('mnist_dataset/mnist_train_100.csv', 'r') as fin:
         training_data_list = fin.readlines()
 
     # train the neural network
 
-    # epochs is the number of times the training data set is used for training
+    # epochs is the number of times the training groups set is used for training
     epochs = 50
 
     for e in range(epochs):
-        # go through all records in the training data set
+        # go through all records in the training groups set
         for record in training_data_list:
             # split the record by the ',' commas
             all_values = record.split(',')
@@ -113,7 +113,7 @@ if __name__ == '__main__':
             targets[int(all_values[0])] = 0.99
             network.train(inputs, targets)
 
-    # load the mnist test data CSV file into a list
+    # load the mnist test groups CSV file into a proc_list
     with open('mnist_dataset/mnist_test_10.csv', 'r') as fin:
         test_data_list = fin.readlines()
 
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     # scorecard for how well the network performs, initially empty
     scorecard = []
 
-    # go through all the records in the test data set
+    # go through all the records in the test groups set
     for record in test_data_list:
         # split the record by the ',' commas
         all_values = record.split(',')
@@ -134,7 +134,7 @@ if __name__ == '__main__':
         outputs = network.query(inputs)
         # the index of the highest value corresponds to the label
         label = numpy.argmax(outputs)
-        # append correct or incorrect to list
+        # append correct or incorrect to proc_list
         if label == correct_label:
             # network's answer matches correct answer, add 1 to scorecard
             scorecard.append(1)

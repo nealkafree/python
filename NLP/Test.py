@@ -1,4 +1,5 @@
 import math
+import torch
 
 import numpy as np
 
@@ -23,8 +24,3 @@ def return_vec(document):
 # vec2 = return_vec(line2.split())
 # res = sum([x * y for x, y in zip(vec1, vec2)])
 # print([20])
-p = np.array([0.55 for _ in range(50)])
-a = 0
-for i in range(25):
-    a += np.prod(1 - p[:i]) * np.prod(p[i:]) * math.factorial(50) / math.factorial(50 - i) / math.factorial(i)
-print(a + 0.5 * np.prod(1 - p[:25]) * np.prod(p[25:]) * math.factorial(50) / math.factorial(25) / math.factorial(25))

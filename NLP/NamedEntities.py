@@ -51,7 +51,7 @@ print("tokens are ready")
 DICT = set(prepare_dictionary("tuzov.words.txt"))
 print("dictionary are ready")
 dataset = prepare_data(tokens)
-print("data are ready")
+print("groups are ready")
 for feature in dataset:
     if ((feature[0]["previous"] and feature[0]["capital"] != "firstUpper") or feature[0]["capital"] != "allLower") and \
             feature[0]["word"] not in PUNCTFULL:

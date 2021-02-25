@@ -155,9 +155,9 @@ def bow_3symb_features(text):
     return features
 
 
-dataset = read_file("data\\texts_train.txt")
-scores = read_file("data\\scores_train.txt")
-evaluate = read_file("data\\dataset_40757_1.txt")
+dataset = read_file("groups\\texts_train.txt")
+scores = read_file("groups\\scores_train.txt")
+evaluate = read_file("groups\\dataset_40757_1.txt")
 
 dataset = prepare_data_simple(dataset, scores)
 evaluate = prepare_eval_simple(evaluate)
@@ -165,7 +165,7 @@ print("start_command training...")
 classifier = SklearnClassifier(sklearn.svm.LinearSVC(max_iter=10000))
 classifier.train(dataset)
 print("start_command evaluating...")
-with open("data/answer.txt", 'a', encoding="UTF-8") as file:
+with open("groups/answer.txt", 'a', encoding="UTF-8") as file:
     for eval_set in evaluate:
         file.write(classifier.classify(eval_set) + '\n')
 

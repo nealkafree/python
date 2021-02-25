@@ -61,7 +61,7 @@ def get_attr(word, i):
 
 
 data = parse_xml_for_data("annot.opcorpora.no_ambig(old).xml")
-# feature_set, words_set = prepare_data(data)
+# feature_set, words_set = prepare_data(groups)
 #
 # k = round(len(feature_set) * 0.8)
 # train_set = feature_set[0:k]

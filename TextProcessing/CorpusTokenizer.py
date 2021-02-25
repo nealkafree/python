@@ -70,7 +70,7 @@ class CorpusTokens:
             print("Директория не найдена")
             return
 
-        """Creating list of tokenized texts"""
+        """Creating proc_list of tokenized texts"""
         self.texts = []
         for file in file_list:
             self.texts.append(tokenize(path, file))
