@@ -5,8 +5,6 @@ from tqdm import tqdm
 from work.toloka_api import TolokaAPI
 import os
 
-TOKEN = 'AQAAAAAl97zMAACtpRN7SJA0tUFtrnLNhmPYSdc'
-
 
 def get_project_id(api, name):
     response = api.get_list_of_projects({'limit': 299}).json()
